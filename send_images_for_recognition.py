@@ -41,8 +41,11 @@ class CaptureAndSendImages:
             # image = cv2.imread(frame)
             image = frame
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # faceCascade = cv2.CascadeClassifier(
+            #     cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+
             faceCascade = cv2.CascadeClassifier(
-                cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+                "haarcascade_frontalface_default.xml")
             faces = faceCascade.detectMultiScale(
                 gray,
                 scaleFactor=1.3,
@@ -66,7 +69,6 @@ class CaptureAndSendImages:
                 current_date = datetime_ist.strftime('%Y-%m-%d')
                 current_time = datetime_ist.strftime('%H:%M:%S')
                 new_image = str(datetime.timestamp(datetime_ist)) + '_face.jpg'
-
                 print("[INFO] Object found. Saving locally.")
                 cv2.imwrite("imgs_for_recog/" + new_image, roi_color)
 
