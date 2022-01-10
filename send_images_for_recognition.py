@@ -12,7 +12,7 @@ import pytz
 # it will get the time zone
 # of the specified location
 IST = pytz.timezone('Asia/Kolkata')
-POST_IMAGE_URL = 'http://20.102.100.20:8080/face_app/upload'
+POST_IMAGE_URL = 'http://20.102.100.20:8080/face_app/upload_for_recog'
 DEVICE_ID = 'tsystem-PU-5-r1-device1'
 # todays_date = today = date.today()
 
@@ -110,7 +110,7 @@ class CaptureAndSendImages:
         vs.stop()
 
 
-def send_captured_image(image):
+def send_captured_image(image_name_with_path):
 
     datetime_ist = datetime.now(IST)
     current_datetime = datetime_ist.strftime(
@@ -119,7 +119,7 @@ def send_captured_image(image):
     current_time = datetime_ist.strftime('%H:%M:%S')
 
     my_img = {
-        'file': open("imgs_for_recog/" + image, 'rb')
+        'file': open(image_name_with_path, 'rb')
     }
 
     data = {
