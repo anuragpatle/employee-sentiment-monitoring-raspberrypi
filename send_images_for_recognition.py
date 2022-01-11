@@ -8,6 +8,8 @@ import cv2
 import sys
 from datetime import datetime
 import pytz
+import time
+from cleanup_tasks import Cleanup
 
 # it will get the time zone
 # of the specified location
@@ -19,13 +21,14 @@ DEVICE_ID = 'tsystem-PU-5-r1-device1'
 
 class CaptureAndSendImages:
 
-    def capture_and_send_faces(self):
+    def capture_and_send_faces(self, camera_src):
 
         # initialize the video stream and allow the camera sensor to warm up
         # Set the ser to the followng
         # src = 0 : for the build in single web cam, could be your laptop webcam
         # src = 2 : I had to set it to 2 inorder to use the USB webcam attached to my laptop
-        vs = VideoStream(src=1, framerate=50).start()
+        vs = VideoStream(src=camera_src, framerate=50).start()
+
         # vs = VideoStream(usePiCamera=True).start()
 
         # start the FPS counter
@@ -83,10 +86,13 @@ class CaptureAndSendImages:
                     'device_id': DEVICE_ID
                 }
 
-                r = requests.post(POST_IMAGE_URL, files=my_img, data=data)
-
+                try:
+                    r = requests.post(POST_IMAGE_URL, files=my_img, data=data)
+                    print(r)
+                except Exception as e:
+                    print("Can't send request to {0}", POST_IMAGE_URL)
+                    print("Oops! ", e.__class__, "occurred.") 
                 # convert server response into JSON format.
-                print(r)
 
             # status = cv2.imwrite('faces_detected.jpg', image)
             # print("[INFO] Image faces_detected.jpg written to filesystem: ", status)
@@ -131,13 +137,57 @@ def send_captured_image(image_name_with_path):
         'device_id': DEVICE_ID
     }
 
-    r = requests.post(POST_IMAGE_URL, files=my_img, data=data)
-
+    try:
+        r = requests.post(POST_IMAGE_URL, files=my_img, data=data)
+    except Exception as e:
+       print("Oops!", e.__class__, "occurred.") 
     # convert server response into JSON format.
     print(r)
 
 
+
+
 if __name__ == "__main__":
+
     object = CaptureAndSendImages()
-    object.capture_and_send_faces()
+
+    working_camera_index = 1
+    try:
+        object.capture_and_send_faces(working_camera_index)
+    except cv2.error as e:
+        print(e)
+        print("Trying with camera src = 0")
+        working_camera_index = 0
+        object.capture_and_send_faces(working_camera_index)
+    except Exception as e:
+        print("Oops!", e.__class__, "occurred.")
+
     # object.send_captured_image("some_path")
+
+
+
+# With Multi Threading =======================================================
+    # Trigger cleanup tasks
+    # cleanupTasks = Cleanup()
+    # object = CaptureAndSendImages()
+
+    # t1 = threading.Thread(target=cleanupTasks.trigger)
+    # t2 = None
+
+    # working_camera_index = 1
+    # try:
+    #     t2 = threading.Thread(target=object.capture_and_send_faces, args=(working_camera_index,))
+    # except cv2.error as e:
+    #     print(e)
+    #     print("Trying with camera src = 0")
+    #     working_camera_index = 0
+    #     t2 = threading.Thread(target=object.capture_and_send_faces, args=(working_camera_index,))
+    # except Exception as e:
+    #     print("Oops!", e.__class__, "occurred.")
+        
+    
+    # t1.start()
+
+    # t2.start()
+
+#! With Multi Threading =======================================================
