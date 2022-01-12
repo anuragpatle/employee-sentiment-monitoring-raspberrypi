@@ -73,6 +73,7 @@ class CaptureAndSendImages:
                 current_time = datetime_ist.strftime('%H:%M:%S')
                 new_image = str(datetime.timestamp(datetime_ist)) + '_face.jpg'
                 print("[INFO] Object found. Saving locally.")
+                cv2.imshow("Facial Recognition is Running", frame)
                 cv2.imwrite("imgs_for_recog/" + new_image, roi_color)
 
                 my_img = {
